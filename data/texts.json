@@ -1,0 +1,20 @@
+[
+    {
+        "id": 1,
+        "text": "She sells sea shels by the seashore.",
+        "author": "-",
+        "difficulty": "easy"
+    },
+    {
+        "id": 2,
+        "text": "If two wiches were watching two watches, which witch would watch which watch?",
+        "author": "-",
+        "difficulty": "medium"
+    },
+    {
+        "id": 3,
+        "text": "A box of biscuits, a box of mixed biscuits.",
+        "author": "-",
+        "difficulty": "easy"
+    }
+]
