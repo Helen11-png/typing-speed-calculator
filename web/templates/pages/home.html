@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing test</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Check your typing speed!!!</h1>
+        <div class="text-display" id="textDisplay">
+            Press "New text" to start!
+        </div>
+        <textarea id="userInput" placeholder="Start typing here..." rows="4"></textarea>
+        <div class="stats">
+            <div>Speed: <span id="speed">0</span> chars/min</div>
+            <div>Accuracy: <span id="accuracy">100</span>%</div>
+        </div>
+        
+        <button onclick="getNewText()">New text</button>
+        <button onclick="startTest()">Start test</button>
+    </div>
+
+    <script src="/static/js/script.js"></script>
+</body>
+</html>
+
+
