@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Statistics</h1>
+        
+        <div class="navigation">
+            <a href="/" class="nav-link">Home page</a>
+        </div>
+        <div class="stats-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Text</th>
+                        <th>Speed</th>
+                        <th>Accuracy</th>
+                    </tr>
+                </thead>
+                <tbody id="statsBody">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="buttons">
+            <button onclick="clearStats()" class="btn-danger">Clear statistics</button>
+        </div>
+    </div>
+
+    <script src="/static/js/statistics.js"></script>
+</body>
+</html>

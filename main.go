@@ -34,6 +34,8 @@ func main() {
 	fs := http.FileServer(http.Dir("./web/static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 	http.HandleFunc("/", homePage)
+	http.HandleFunc("/stats", statsPage)
+	http.HandleFunc("/statistics", statsPage)
 	http.HandleFunc("/api/random-text", getRandomText)
 	log.Println("🚀 Сервер запущен на http://localhost:8080")
 	log.Println("Нажмите Ctrl+C для остановки")
@@ -59,9 +61,22 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func statsPage(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles("web/templates/pages/statistics.html")
+	if err != nil {
+		http.Error(w, "Error loading the statistics page", http.StatusInternalServerError)
+		log.Println("Error parsing statistics.html:", err)
+		return
+	}
+	err = tmpl.Execute(w, nil)
+	if err != nil {
+		log.Println("Template execution error statistics.html:", err)
+	}
+}
+
 func getRandomText(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
+		http.Error(w, "The method is not supported", http.StatusMethodNotAllowed)
 		return
 	}
 	rand.Seed(time.Now().UnixNano())
@@ -70,7 +85,7 @@ func getRandomText(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	err := json.NewEncoder(w).Encode(randomText)
 	if err != nil {
-		log.Println("Ошибка отправки JSON:", err)
-		http.Error(w, "Ошибка сервера", http.StatusInternalServerError)
+		log.Println("Sending error JSON:", err)
+		http.Error(w, "Server error", http.StatusInternalServerError)
 	}
 }
