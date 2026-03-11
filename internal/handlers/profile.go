@@ -3,7 +3,8 @@ package handlers
 import (
 	"html/template"
 	"net/http"
-	"your-project/internal/database"
+
+	"github.com/Helen11_png/typing-speed-calculator/internal/database"
 )
 
 func ProfilePage(w http.ResponseWriter, r *http.Request) {

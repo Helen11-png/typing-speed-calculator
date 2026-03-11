@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import (
 	"encoding/json"
@@ -6,11 +6,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"os"
 	"time"
-
-	//"github.com/Helen11_png/typing-speed-calculator/internal/handlers"
-	"github.com/Helen11_png/typing-speed-calculator/internal/database"
 )
 
 type Text struct {
@@ -22,37 +18,12 @@ type Text struct {
 
 var allTexts []Text
 
-func main() {
-	jsonFile, err := os.Open("data/texts.json")
-	if err != nil {
-		log.Fatal("Ошибка открытия texts.json:", err)
-	}
-	defer jsonFile.Close()
-	decoder := json.NewDecoder(jsonFile)
-	err = decoder.Decode(&allTexts)
-	if err != nil {
-		log.Fatal("Ошибка парсинга JSON:", err)
-	}
-	log.Printf("Загружено %d текстов для печати\n", len(allTexts))
-	err = database.InitDB()
-	if err != nil {
-		log.Fatal("Ошибка подключения к БД:", err)
-	}
-	defer database.DB.Close()
-	fs := http.FileServer(http.Dir("./web/static"))
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
-	http.HandleFunc("/", homePage)
-	http.HandleFunc("/stats", statsPage)
-	http.HandleFunc("/statistics", statsPage)
-	http.HandleFunc("/api/random-text", getRandomText)
-	log.Println("🚀 Сервер запущен на http://localhost:8080")
-	log.Println("Нажмите Ctrl+C для остановки")
-	err = http.ListenAndServe(":8080", nil)
-	if err != nil {
-		log.Fatal("Ошибка запуска сервера:", err)
-	}
+// SetTexts передает тексты из main.go в handlers
+func SetTexts(texts []Text) {
+	allTexts = texts
 }
-func homePage(w http.ResponseWriter, r *http.Request) {
+
+func HomePage(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
 		return
@@ -69,7 +40,7 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func statsPage(w http.ResponseWriter, r *http.Request) {
+func StatsPage(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles("web/templates/pages/statistics.html")
 	if err != nil {
 		http.Error(w, "Error loading the statistics page", http.StatusInternalServerError)
@@ -82,14 +53,16 @@ func statsPage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getRandomText(w http.ResponseWriter, r *http.Request) {
+func GetRandomText(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "The method is not supported", http.StatusMethodNotAllowed)
 		return
 	}
+
 	rand.Seed(time.Now().UnixNano())
 	randomIndex := rand.Intn(len(allTexts))
 	randomText := allTexts[randomIndex]
+
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	err := json.NewEncoder(w).Encode(randomText)
 	if err != nil {
