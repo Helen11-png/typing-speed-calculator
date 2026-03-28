@@ -7,7 +7,6 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
-	"time"
 
 	//"github.com/Helen11_png/typing-speed-calculator/internal/handlers"
 	"github.com/Helen11_png/typing-speed-calculator/internal/database"
@@ -87,7 +86,6 @@ func getRandomText(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "The method is not supported", http.StatusMethodNotAllowed)
 		return
 	}
-	rand.Seed(time.Now().UnixNano())
 	randomIndex := rand.Intn(len(allTexts))
 	randomText := allTexts[randomIndex]
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
