@@ -1,29 +1,85 @@
 package database
 
-import "github.com/Helen11_png/typing-speed-calculator/internal/models"
+import (
+	"database/sql"
+	"log"
 
-func GetUserProfile(userID int) (*models.Profile, error) {
-	// SQL запрос к базе данных
-	row := DB.QueryRow(`
+	_ "github.com/mattn/go-sqlite3"
+)
+
+var DB *sql.DB
+
+func InitDB() error {
+	var err error
+	DB, err = sql.Open("sqlite3", "./data/app.db")
+	if err != nil {
+		return err
+	}
+
+	// Создаем таблицы
+	createTables := `
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY,
+        username TEXT UNIQUE,
+        password TEXT,
+        created_at DATETIME
+    );
+    
+    CREATE TABLE IF NOT EXISTS results (
+        id INTEGER PRIMARY KEY,
+        user_id INTEGER,
+        speed INTEGER,
+        accuracy INTEGER,
+        text_preview TEXT,
+        created_at DATETIME,
+        FOREIGN KEY(user_id) REFERENCES users(id)
+    );`
+
+	_, err = DB.Exec(createTables)
+	if err != nil {
+		return err
+	}
+
+	log.Println("База данных инициализирована")
+	return nil
+}
+
+// Функция для получения профиля пользователя
+func GetUserProfile(userID int) (map[string]interface{}, error) {
+	var username string
+	var createdAt string
+	var testsCount int
+	var avgSpeed float64
+	var bestSpeed int
+
+	query := `
         SELECT 
             u.username,
+            u.created_at,
             COUNT(r.id) as tests_count,
-            AVG(r.speed) as avg_speed,
-            MAX(r.speed) as best_speed,
-            u.created_at
+            COALESCE(AVG(r.speed), 0) as avg_speed,
+            COALESCE(MAX(r.speed), 0) as best_speed
         FROM users u
         LEFT JOIN results r ON u.id = r.user_id
-        WHERE u.id = $1
+        WHERE u.id = ?
         GROUP BY u.id, u.username, u.created_at
-    `, userID)
+    `
 
-	var profile models.Profile
-	err := row.Scan(
-		&profile.Username,
-		&profile.TestsCount,
-		&profile.AverageSpeed,
-		&profile.BestSpeed,
-		&profile.JoinDate,
+	err := DB.QueryRow(query, userID).Scan(
+		&username, &createdAt, &testsCount, &avgSpeed, &bestSpeed,
 	)
-	return &profile, err
+
+	if err != nil {
+		return nil, err
+	}
+
+	profile := map[string]interface{}{
+		"username":    username,
+		"created_at":  createdAt,
+		"tests_count": testsCount,
+		"avg_speed":   avgSpeed,
+		"best_speed":  bestSpeed,
+	}
+
+	return profile, nil
 }
